@@ -13,10 +13,10 @@ namespace HappyCodingThis.WebCrawler.Models
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public Guid Id { get; set; }
+		public Guid CrawlRunId { get; set; }
 		public TimeSpan Elapsed { get; set; }
 		public string RootUrl { get; set; }
-		public Exception ErrorMessage { get; set; }
-		public List<RetrievedPage> Pages { get; set; }
+		public string ErrorMessage { get; set; }
+		public ICollection<RetrievedPage> Pages { get; set; }
 	}
 }

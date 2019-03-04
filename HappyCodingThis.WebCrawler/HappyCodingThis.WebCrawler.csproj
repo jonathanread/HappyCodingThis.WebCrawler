@@ -69,6 +69,19 @@
   <ItemGroup>
     <Compile Include="Crawler.cs" />
     <Compile Include="Data\CrawlRunContext.cs" />
+    <Compile Include="Migrations\201903041344123_InitialCreate.cs" />
+    <Compile Include="Migrations\201903041344123_InitialCreate.Designer.cs">
+      <DependentUpon>201903041344123_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903041359599_ChngigRelationShips.cs" />
+    <Compile Include="Migrations\201903041359599_ChngigRelationShips.Designer.cs">
+      <DependentUpon>201903041359599_ChngigRelationShips.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903041403396_RemoveURITypeAddStringUrlField.cs" />
+    <Compile Include="Migrations\201903041403396_RemoveURITypeAddStringUrlField.Designer.cs">
+      <DependentUpon>201903041403396_RemoveURITypeAddStringUrlField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\CrawlRun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\RetrievedPage.cs" />
@@ -76,6 +89,17 @@
   <ItemGroup>
     <None Include="App.Config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201903041344123_InitialCreate.resx">
+      <DependentUpon>201903041344123_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903041359599_ChngigRelationShips.resx">
+      <DependentUpon>201903041359599_ChngigRelationShips.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903041403396_RemoveURITypeAddStringUrlField.resx">
+      <DependentUpon>201903041403396_RemoveURITypeAddStringUrlField.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

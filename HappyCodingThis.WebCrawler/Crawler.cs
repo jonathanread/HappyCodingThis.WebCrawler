@@ -18,7 +18,6 @@ namespace HappyCodingThis.WebCrawler
 			HasError = false;
 			Pages = new List<RetrievedPage>();
 			InitCrawlerConfig();
-			crawlRunContext = new CrawlRunContext();
 		}
 
 		public Crawler(Uri uri)
@@ -28,23 +27,14 @@ namespace HappyCodingThis.WebCrawler
 			WebsiteToCrawl = uri;
 
 			InitCrawlerConfig();
-			crawlRunContext = new CrawlRunContext();
-
 		}
 		#endregion Constructors
 
 		#region Public Methods
 		public void Crawl()
 		{
-			PoliteWebCrawler crawler = new PoliteWebCrawler(crawlConfig, null, null, null, null, null, null, null, null);
-			crawler.PageCrawlStartingAsync += Crawler_ProcessPageCrawlStarting;
-			crawler.PageCrawlCompletedAsync += Crawler_ProcessPageCrawlCompleted;
-			crawler.PageCrawlDisallowedAsync += Crawler_PageCrawlDisallowed;
-			crawler.PageLinksCrawlDisallowedAsync += Crawler_PageLinksCrawlDisallowed;
-
 			CrawlResult result = crawler.Crawl(WebsiteToCrawl); //This is synchronous, it will not go to the next line until the crawl has completed
 			PagesCrawled = result.CrawlContext.CrawledCount;
-
 			if (result.ErrorOccurred)
 			{
 				HasError = true;
@@ -55,9 +45,13 @@ namespace HappyCodingThis.WebCrawler
 				Message = $"Crawl of {result.RootUri.AbsoluteUri} completed without error and crawled {PagesCrawled} pages and {Pages.Count} unique pages.";
 			}
 
-			var crawlRun = new CrawlRun() { Pages = Pages, Elapsed = result.Elapsed, RootUrl = result.RootUri.AbsoluteUri, ErrorMessage = result.ErrorOccurred == true ? result.ErrorException : null };
-			crawlRunContext.CrawlRuns.Add(crawlRun);
-			crawlRunContext.SaveChanges();
+			var crawlRun = new CrawlRun() { Pages = Pages, Elapsed = result.Elapsed, RootUrl = result.RootUri.AbsoluteUri, ErrorMessage = result.ErrorOccurred == true ? result.ErrorException.Message : null };
+
+			using (crawlRunContext = new CrawlRunContext())
+			{
+				crawlRunContext.CrawlRuns.Add(crawlRun);
+				crawlRunContext.SaveChanges();
+			}
 
 		}
 		#endregion Public Methods
@@ -85,7 +79,7 @@ namespace HappyCodingThis.WebCrawler
 			var parentPath = $"{parentUri.Scheme}{Uri.SchemeDelimiter}{parentUri.Authority}{parentUri.AbsolutePath}";
 			if (!Pages.Any(rp => rp.PageTitle == title || (rp.Path == path && rp.ParentPath == parentPath)))
 			{
-				Pages.Add(new RetrievedPage() { HtmlDoc = doc, PageTitle = title, Uri = uri, Path = path, ParentPath = parentPath });
+				Pages.Add(new RetrievedPage() { HtmlDoc = doc, PageTitle = title, Url = uri.ToString(), Path = path, ParentPath = parentPath });
 			}
 			Console.WriteLine($"Page Crawled: {e.CrawledPage.Uri} in {(requestCompleted - requestStarted).TotalSeconds} seconds");
 		}
@@ -103,6 +97,12 @@ namespace HappyCodingThis.WebCrawler
 				MaxConcurrentThreads = 10,
 				MaxPagesToCrawl = 1000
 			};
+
+			crawler = new PoliteWebCrawler(crawlConfig, null, null, null, null, null, null, null, null);
+			crawler.PageCrawlStartingAsync += Crawler_ProcessPageCrawlStarting;
+			crawler.PageCrawlCompletedAsync += Crawler_ProcessPageCrawlCompleted;
+			crawler.PageCrawlDisallowedAsync += Crawler_PageCrawlDisallowed;
+			crawler.PageLinksCrawlDisallowedAsync += Crawler_PageLinksCrawlDisallowed;
 		}
 		#endregion Private Methods
 
@@ -118,6 +118,7 @@ namespace HappyCodingThis.WebCrawler
 		#region Private Properties
 		private CrawlConfiguration crawlConfig;
 		private CrawlRunContext crawlRunContext;
+		private PoliteWebCrawler crawler;
 
 		#endregion Private Properties
 	}
